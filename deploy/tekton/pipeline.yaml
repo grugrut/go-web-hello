@@ -1,0 +1,59 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: go-web-hello-pipeline
+spec:
+  workspaces:
+    - name: shared-data
+  tasks:
+    - name: fetch-repo
+      taskRef:
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: shared-data
+      params:
+        - name: url
+          value: https://github.com/grugrut/go-web-hello.git
+    - name: build
+      taskRef:
+        name: golang-build
+      runAfter:
+        - fetch-repo
+      params:
+        - name: package
+          value: github.com/grugrut/go-web-hello
+        - name: packages
+          value: ./...
+      workspaces:
+        - name: source
+          workspace: shared-data
+    - name: docker-build
+      taskRef:
+        name: buildah
+      runAfter:
+        - build
+      params:
+        - name: IMAGE
+          value: grugrut/go-web-hello
+      workspaces:
+        - name: source
+          workspace: shared-data
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: go-web-hello-pipeline-
+spec:
+  pipelineRef:
+    name: go-web-hello-pipeline
+  workspaces:
+    - name: shared-data
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+          storageClassName: nfs-client
