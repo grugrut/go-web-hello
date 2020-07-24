@@ -1,6 +1,6 @@
 FROM alpine
 
-COPY go-web-hello .
+COPY go-web-hello /
 
 EXPOSE 8080
 

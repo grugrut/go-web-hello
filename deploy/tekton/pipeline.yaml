@@ -39,21 +39,13 @@ spec:
       workspaces:
         - name: source
           workspace: shared-data
+    - name: create-deployment
+      taskRef:
+        name: kubectl-deploy-pod
 ---
-apiVersion: tekton.dev/v1beta1
-kind: PipelineRun
+apiVersion: v1
+kind: ServiceAccount
 metadata:
-  generateName: go-web-hello-pipeline-
-spec:
-  pipelineRef:
-    name: go-web-hello-pipeline
-  workspaces:
-    - name: shared-data
-      volumeClaimTemplate:
-        spec:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: 1Gi
-          storageClassName: nfs-client
+  name: build-bot
+secrets:
+  - name: basic-user-pass
