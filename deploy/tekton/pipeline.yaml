@@ -39,9 +39,6 @@ spec:
       workspaces:
         - name: source
           workspace: shared-data
-    - name: create-deployment
-      taskRef:
-        name: kubectl-deploy-pod
 ---
 apiVersion: v1
 kind: ServiceAccount
